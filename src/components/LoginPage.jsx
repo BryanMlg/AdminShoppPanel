@@ -1,7 +1,9 @@
 import { LockClosedIcon } from '@heroicons/react/solid';
 import { useRef } from 'react';
+import { useAuth } from '@hooks/useAuth';
 export default function LoginPage() {
   const form = useRef(null);
+  const auth = useAuth();
   const HandleSubmit = event => {
     event.preventDefault();
     const formData = new FormData(form.current);
@@ -9,8 +11,11 @@ export default function LoginPage() {
       username: formData.get('email'),
       password: formData.get('password'),
     };
-    console.log(data);
+    auth.signIn(data.username, data.password).then(()=>{
+      alert("Login Succes");
+    });
   };
+
   return (
     <>
       <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
