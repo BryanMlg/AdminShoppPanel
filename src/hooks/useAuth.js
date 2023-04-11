@@ -1,16 +1,9 @@
 /* eslint-disable no-unused-vars */
 import { useState, useContext, createContext } from 'react';
-import Cookies from 'js-cookie';
+import Cookie from 'js-cookie';
 import endPoints from '@services/api';
 
 const authContext = createContext();
-
-const options = {
-  headers: {
-    accept: '*/*',
-    'Content-Type': 'application/json',
-  },
-};
 
 export function ProviderAuth({ children }) {
   const auth = useProviderAuth();
@@ -22,23 +15,38 @@ export const useAuth = () => {
   return auth;
 };
 
+export const makeFetch = (path = "", method = "", body = {}) => {
+  const access_token = Cookie.get("access_token");
+  const options = {
+      method,
+      headers: {
+          accept: "*/*",
+          "Content-Type": "application/json",
+      },
+  };
+  if (method !== "GET") {
+      options.body = JSON.stringify(body);
+  }
+  if (access_token) {
+      options.headers.Authorization = `Bearer ${access_token}`;
+  }
+  return fetch(path, options);
+};
+
 const useProviderAuth = () => {
   const [user, setUser] = useState(null);
 
   const signIn = async (email, password) => {
     try {
-      const response = await fetch(endPoints.auth.login, {
-        method: 'POST',
-        headers: options.headers,
-        body: JSON.stringify({ email, password }),
-      });
-
+      const response = await makeFetch(endPoints.auth.login, "POST", { email, password });
       if (!response.ok) {
         throw new Error('Failed to log in');
       }
 
-      const { data: access_token } = await response.json();
-      alert({access_token});
+      const access_token = await response.json();
+      if (access_token) {
+        Cookie.set('token', access_token.access_token, { expires: 5 });
+      }
     } catch (error) {
       console.error(error);
     }
