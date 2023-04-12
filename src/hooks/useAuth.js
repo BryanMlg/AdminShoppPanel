@@ -15,22 +15,26 @@ export const useAuth = () => {
   return auth;
 };
 
-export const makeFetch = (path = "", method = "", body = {}) => {
-  const access_token = Cookie.get("access_token");
+export const makeFetch = async (path = '', method = '', body = {}) => {
+  const access_token = Cookie.get('access_token');
   const options = {
-      method,
-      headers: {
-          accept: "*/*",
-          "Content-Type": "application/json",
-      },
+    method,
+    headers: {
+      accept: '*/*',
+      'Content-Type': 'application/json',
+    },
   };
-  if (method !== "GET") {
-      options.body = JSON.stringify(body);
+  if (method !== 'GET') {
+    options.body = JSON.stringify(body);
   }
   if (access_token) {
-      options.headers.Authorization = `Bearer ${access_token}`;
+    options.headers.Authorization = `Bearer ${access_token}`;
   }
-  return fetch(path, options);
+  const response = await fetch(path, options);
+  if (!response.ok) {
+    throw new Error('Request failed');
+  }
+  return response;
 };
 
 const useProviderAuth = () => {
@@ -38,14 +42,19 @@ const useProviderAuth = () => {
 
   const signIn = async (email, password) => {
     try {
-      const response = await makeFetch(endPoints.auth.login, "POST", { email, password });
+      const response = await makeFetch(endPoints.auth.login, 'POST', { email, password });
       if (!response.ok) {
         throw new Error('Failed to log in');
       }
-
-      const access_token = await response.json();
+      const { access_token } = await response.json();
       if (access_token) {
-        Cookie.set('token', access_token.access_token, { expires: 5 });
+        Cookie.set('access_token', access_token, { expires: 5 });
+        const profileResponse = await makeFetch(endPoints.auth.profile, 'GET');
+        if (!profileResponse.ok) {
+          throw new Error('Failed to fetch user profile');
+        }
+        const user = await profileResponse.json();
+        setUser(user);
       }
     } catch (error) {
       console.error(error);
