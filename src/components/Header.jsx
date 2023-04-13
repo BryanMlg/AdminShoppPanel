@@ -35,7 +35,7 @@ export default function Header() {
               <div className="flex items-center justify-between h-16">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    
+                    Icono
                   </div>
                   <div className="hidden md:block">
                     <div className="ml-10 flex items-baseline space-x-4">
@@ -67,7 +67,7 @@ export default function Header() {
                       <div>
                         <Menu.Button className="max-w-xs bg-gray-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                           <span className="sr-only">Open user menu</span>
-                          <Image alt="" className="h-8 w-8 rounded-full" height={100} src={userData.imageUrl} width={100} />
+                          <Image alt="" className="h-8 w-8 rounded-full" height={100} src={userData?.imageUrl} width={100} />
                         </Menu.Button>
                       </div>
                       <Transition
