@@ -1,30 +1,32 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+import { useState } from 'react';
+import { CheckIcon } from '@heroicons/react/solid';
+import Modal from '@common/Modal';
 import Image from 'next/image';
-import { Chart } from '@common/Chart.js';
+import FormProduct from '@components/FormProducts';
 import useGetProducts from '@hooks/useGetData';
-
-export default function Dashboard() {
-  const products = useGetProducts(5, 5);
-
-  const categoryNames = products?.map(product => product.category);
-  const categoryCount = categoryNames?.map(category => category.name);
-
-  const countOccurrences = arr => arr.reduce((prev, curr) => ((prev[curr] = ++prev[curr] || 1), prev), {});
-
-  const data = {
-    datasets: [
-      {
-        label: 'Category',
-        data: countOccurrences(categoryCount),
-        borderWidth: 2,
-        backgroundColor: ['#ffbb11', '#c0c0c0', '#50AF95', 'f3ba2f', '#2a71d0'],
-      },
-    ],
-  };
-
+export default function products() {
+  const [open, setOpen] = useState(false);
+  const products = useGetProducts();
   return (
     <>
-      <Chart chartData={data} className="mb-8 mt-2" />
-      <div className="flex flex-col">
+      <div className="lg:flex lg:items-center lg:justify-between mt-5 flex-1 min-w-0">
+        <div className="flex-1 min-w-0"/>
+        <div className="mt-5 flex lg:mt-0 lg:ml-4">
+          <span className="sm:ml-3">
+            <button
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              type="button"
+              onClick={() => setOpen(true)}
+            >
+              <CheckIcon aria-hidden="true" className="-ml-1 mr-2 h-5 w-5" />
+              Add Product
+            </button>
+          </span>
+        </div>
+      </div>
+
+      <div className="flex flex-col mt-5">
         <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
             <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
@@ -41,7 +43,7 @@ export default function Dashboard() {
                       Price
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">
-                      ID
+                      Id
                     </th>
                     <th className="relative px-6 py-3" scope="col">
                       <span className="sr-only">Edit</span>
@@ -57,7 +59,7 @@ export default function Dashboard() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
-                            <Image alt="" className="h-10 w-10 rounded-full" height={200} loader={() => product.images[0]} src={product.images[0]} width={200} />
+                            <Image alt="" className="h-10 w-10 rounded-full" height={200} loader={() => product.images[0]} src={product.images[0]} width={200} unoptimized />
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">{product.title}</div>
@@ -89,6 +91,9 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      <Modal open={open} setOpen={setOpen}>
+       <FormProduct/>
+      </Modal>
     </>
   );
 }
