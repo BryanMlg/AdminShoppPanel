@@ -1,8 +1,7 @@
 import { useRef } from 'react';
-import addProduct from '@services/api/products';
-export default function FormProduct() {
+import { addProduct } from '@services/api/products';
+export default function FormProduct({ setOpen, setAlert }) {
   const formRef = useRef(null);
-
   const handleSubmit = event => {
     event.preventDefault();
     const formData = new FormData(formRef.current);
@@ -13,13 +12,28 @@ export default function FormProduct() {
       categoryId: parseInt(formData.get('category')),
       images: [formData.get('images').name],
     };
-    addProduct(data);
-    
+    addProduct(data)
+      .then(() => {
+        setAlert({
+          type: 'success',
+          message: 'Product added successfully!',
+          active: true,
+          autoClose: false,
+        });
+        setOpen(false);
+      })
+      .catch(error => {
+        setAlert({
+          type: 'error',
+          message: error.message,
+          active: true,
+          autoClose: false,
+        });
+      });
   };
-
   return (
     <form ref={formRef} onSubmit={handleSubmit}>
-      <div className=" z-10 inset-0 overflow-y-auto">
+      <div className="z-10 inset-0 overflow-y-auto">
         <div className="px-4 py-5 bg-white sm:p-6">
           <div className="grid grid-cols-6 gap-6">
             <div className="col-span-6 sm:col-span-3">

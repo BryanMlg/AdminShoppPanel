@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useState } from 'react';
 import { CheckIcon } from '@heroicons/react/solid';
@@ -5,13 +7,29 @@ import Modal from '@common/Modal';
 import Image from 'next/image';
 import FormProduct from '@components/FormProducts';
 import useGetProducts from '@hooks/useGetData';
+import Alert from '@common/Alert';
+import useAlert from '@hooks/useAlert';
+import { deleteProduct } from '@services/api/products';
 export default function products() {
   const [open, setOpen] = useState(false);
+  const { alert, setAlert, toggleAlert } = useAlert();
   const products = useGetProducts();
+  const handleDelete = (id) => {
+    deleteProduct(id)
+      .then(() =>{
+        setAlert({
+          active: true,
+          message: 'Delete product successfuly',
+          type: 'success',
+          autoClose: false,
+        });
+    });
+  };
   return (
     <>
+      <Alert alert={alert} handleClose={toggleAlert} />
       <div className="lg:flex lg:items-center lg:justify-between mt-5 flex-1 min-w-0">
-        <div className="flex-1 min-w-0"/>
+        <div className="flex-1 min-w-0" />
         <div className="mt-5 flex lg:mt-0 lg:ml-4">
           <span className="sm:ml-3">
             <button
@@ -59,7 +77,7 @@ export default function products() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
-                            <Image alt="" className="h-10 w-10 rounded-full" height={200} loader={() => product.images[0]} src={product.images[0]} width={200} unoptimized />
+                            <Image unoptimized alt="" className="h-10 w-10 rounded-full" height={200} loader={() => product.images[0]} src={product.images[0]} width={200} />
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">{product.title}</div>
@@ -78,11 +96,7 @@ export default function products() {
                           Edit
                         </a>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a className="text-indigo-600 hover:text-indigo-900" href="/edit">
-                          Delete
-                        </a>
-                      </td>
+                      <td aria-hidden="true" className="cursor-pointer px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-indigo-600 hover:text-indigo-900" onClick={() => handleDelete(product.id)}>Delete</td>
                     </tr>
                   ))}
                 </tbody>
@@ -92,7 +106,7 @@ export default function products() {
         </div>
       </div>
       <Modal open={open} setOpen={setOpen}>
-       <FormProduct/>
+        <FormProduct setAlert={setAlert} setOpen={setOpen} />
       </Modal>
     </>
   );
