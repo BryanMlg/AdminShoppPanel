@@ -10,10 +10,11 @@ import useGetProducts from '@hooks/useGetData';
 import Alert from '@common/Alert';
 import useAlert from '@hooks/useAlert';
 import { deleteProduct } from '@services/api/products';
+import Link from 'next/link';
 export default function products() {
   const [open, setOpen] = useState(false);
   const { alert, setAlert, toggleAlert } = useAlert();
-  const products = useGetProducts();
+  const products = useGetProducts(undefined,undefined, alert);
   const handleDelete = (id) => {
     deleteProduct(id)
       .then(() =>{
@@ -92,9 +93,9 @@ export default function products() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.id}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a className="text-indigo-600 hover:text-indigo-900" href="/edit">
+                        <Link className="text-indigo-600 hover:text-indigo-900" href={`/dashboard/edit/${product.id}`}>
                           Edit
-                        </a>
+                        </Link>
                       </td>
                       <td aria-hidden="true" className="cursor-pointer px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-indigo-600 hover:text-indigo-900" onClick={() => handleDelete(product.id)}>Delete</td>
                     </tr>

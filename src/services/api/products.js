@@ -24,4 +24,15 @@ const deleteProduct = async id => {
   }
 };
 
-export { addProduct, deleteProduct };
+const updateProduct = async (id, body) => {
+  try {
+    const response = await makeFetch(endPoints.products.updateProduct(id), 'PUT', body);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw new Error('Error updating product');
+  }
+};
+
+export { addProduct, deleteProduct, updateProduct };

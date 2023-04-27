@@ -3,7 +3,7 @@ import endPoints from '@services/api';
 import { useState, useEffect } from 'react';
 
 
-const useGetProducts = (PRODUCT_LIMIT, PRODUCT_OFFSET) => {
+const useGetProducts = (PRODUCT_LIMIT, PRODUCT_OFFSET, alert) => {
   const request = (PRODUCT_LIMIT, PRODUCT_OFFSET) ? `${endPoints.products.getProducts(PRODUCT_LIMIT, PRODUCT_OFFSET)}` : `${endPoints.products.getAllProducts}`;
   const [products, setProducts] = useState([]);
   useEffect(() => {
@@ -20,7 +20,7 @@ const useGetProducts = (PRODUCT_LIMIT, PRODUCT_OFFSET) => {
         alert(error);
       }
     })();
-  },[request]);
+  },[alert]);
 
   return products;
 };

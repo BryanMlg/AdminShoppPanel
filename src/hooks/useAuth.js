@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useState, useContext, createContext } from 'react';
+import { useState, useContext, createContext, useEffect } from 'react';
 import Cookie from 'js-cookie';
 import endPoints from '@services/api';
 
@@ -11,8 +11,7 @@ export function ProviderAuth({ children }) {
 }
 
 export const useAuth = () => {
-  const auth = useContext(authContext);
-  return auth;
+  return useContext(authContext);
 };
 
 export const makeFetch = async (path = '', method = '', body = {}) => {
@@ -38,7 +37,25 @@ export const makeFetch = async (path = '', method = '', body = {}) => {
 };
 
 const useProviderAuth = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(Cookie.get('access_token') || null);
+
+  useEffect(() => {
+    const access_token = Cookie.get('access_token');
+    if (access_token) {
+      (async () => {
+        try {
+          const profileResponse = await makeFetch(endPoints.auth.profile, 'GET');
+          if (!profileResponse.ok) {
+            throw new Error('Failed to fetch user profile');
+          }
+          const user = await profileResponse.json();
+          setUser(user);
+        } catch (error) {
+          console.error(error);
+        }
+      })();
+    }
+  }, []);
 
   const signIn = async (email, password) => {
     try {
@@ -61,8 +78,14 @@ const useProviderAuth = () => {
     }
   };
 
+  const signOut = async () => {
+      Cookie.remove('access_token');
+      setUser(null);
+  };
+
   return {
     user,
     signIn,
+    signOut,
   };
 };
